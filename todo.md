@@ -1,0 +1,2 @@
+- Add redis support
+- Add README.md docs

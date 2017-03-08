@@ -1,0 +1,4 @@
+package: github.com/goenning/go-cache-demo
+import:
+- package: gopkg.in/redis.v5
+  version: ^5.2.9
