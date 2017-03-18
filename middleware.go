@@ -4,21 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"time"
 )
 
-func isCacheable(r *http.Request) bool {
-	return strings.Contains(r.Header.Get("Accept"), "text/html")
-}
-
 func cached(duration string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		if !isCacheable(r) {
-			handler(w, r)
-			return
-		}
 
 		content := storage.Get(r.RequestURI)
 		if content != "" {
