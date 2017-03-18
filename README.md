@@ -1,6 +1,6 @@
 # Server-side cache with Go
 
-...
+Read more about this at [https://goenning.net/2017/03/18/server-side-cache-go/](https://goenning.net/2017/03/18/server-side-cache-go/).
 
 # How to use it
 
@@ -13,4 +13,6 @@
 
 # Demo application
 
-Happy Coding :)
+You can see this application running live on [https://go-cache-demo.herokuapp.com/](https://go-cache-demo.herokuapp.com/)
+
+Happy Coding! :)

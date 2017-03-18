@@ -65,6 +65,10 @@ func about(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "favicon.ico")
+	})
+
 	http.Handle("/", cached("10s", index))
 	http.HandleFunc("/about", about)
 
