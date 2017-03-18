@@ -4,6 +4,6 @@ import "time"
 
 //Storage mecanism for caching strings
 type Storage interface {
-	Get(key string, duration time.Duration) string
+	Get(key string) string
 	Set(key, content string, duration time.Duration)
 }

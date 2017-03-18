@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -10,13 +11,26 @@ import (
 	"strings"
 
 	"github.com/goenning/go-cache-demo/cache"
+	"github.com/goenning/go-cache-demo/cache/memory"
 	"github.com/goenning/go-cache-demo/cache/redis"
 )
 
 var storage cache.Storage
 
 func init() {
-	storage, _ = redis.NewStorage(os.Getenv("REDIS_URL"))
+	strategy := flag.String("s", "memory", "Cache strategy (memory or redis)")
+	flag.Parse()
+
+	if *strategy == "memory" {
+		storage = memory.NewStorage()
+	} else if *strategy == "redis" {
+		var err error
+		if storage, err = redis.NewStorage(os.Getenv("REDIS_URL")); err != nil {
+			panic(err)
+		}
+	} else {
+		panic(fmt.Sprintf("Invalid cache strategy %s.", *strategy))
+	}
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -66,6 +80,12 @@ func cached(duration string, handler func(w http.ResponseWriter, r *http.Request
 
 func main() {
 	http.Handle("/", cached("5s", index))
-	fmt.Println("Server is up and listening.")
-	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Printf("Server is up and listening on port %s.\n", port)
+	http.ListenAndServe(":"+port, nil)
 }
