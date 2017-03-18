@@ -4,11 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"time"
-
-	"strings"
 
 	"github.com/goenning/go-cache-demo/cache"
 	"github.com/goenning/go-cache-demo/cache/memory"
@@ -34,52 +31,42 @@ func init() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	content := fmt.Sprintf("Hello World! Current time is: %s", time.Now())
+	// Instead of sleeping, imagine that this handler takes 2 seconds to query database and build the result...
+	time.Sleep(2 * time.Second)
+
+	content := fmt.Sprintf(`
+		<h1>Hello World! You are on: %s</h1> 
+		<p>Current time is: %s</p>
+
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/?page=1">Page 1</a></li>
+			<li><a href="/?page=2">Page 2</a></li>
+			<li><a href="/about">About (not cached!)</a></li>
+		</ul>
+	`, r.RequestURI, time.Now())
 	w.Write([]byte(content))
 }
 
-func isCacheable(r *http.Request) bool {
-	return strings.Contains(r.Header.Get("Accept"), "text/html")
-}
+func about(w http.ResponseWriter, r *http.Request) {
+	// Instead of sleeping, imagine that this handler takes 2 seconds to query database and build the result...
+	time.Sleep(2 * time.Second)
 
-func cached(duration string, handler func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	content := fmt.Sprintf(`
+		<h1>About!</h1> 
+		<p>Current time is: %s</p>
 
-		if !isCacheable(r) {
-			handler(w, r)
-			return
-		}
-
-		content := storage.Get(r.RequestURI)
-		if content != "" {
-			fmt.Print("Cache Hit!\n")
-			w.Write([]byte(content))
-		} else {
-			c := httptest.NewRecorder()
-			handler(c, r)
-
-			for k, v := range c.HeaderMap {
-				w.Header()[k] = v
-			}
-
-			w.WriteHeader(c.Code)
-			content := c.Body.String()
-
-			if d, err := time.ParseDuration(duration); err == nil {
-				fmt.Printf("New cached page: %s for %s\n", r.RequestURI, duration)
-				storage.Set(r.RequestURI, content, d)
-			} else {
-				fmt.Printf("Content not cached, %s\n", err)
-			}
-
-			w.Write([]byte(content))
-		}
-
-	})
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="/about">About (not cached!)</a></li>
+		</ul>
+	`, time.Now())
+	w.Write([]byte(content))
 }
 
 func main() {
-	http.Handle("/", cached("5s", index))
+	http.Handle("/", cached("10s", index))
+	http.HandleFunc("/about", about)
 
 	port := os.Getenv("PORT")
 	if port == "" {
