@@ -1,2 +1,3 @@
 - Write how to use 
 - Link to blog post
+- Publish on now
