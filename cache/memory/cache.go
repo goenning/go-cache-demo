@@ -7,7 +7,7 @@ import (
 
 // Item is a cached reference
 type Item struct {
-	Content    string
+	Content    []byte
 	Expiration int64
 }
 
@@ -34,20 +34,20 @@ func NewStorage() *Storage {
 }
 
 //Get a cached content by key
-func (s Storage) Get(key string) string {
+func (s Storage) Get(key string) []byte {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
 	item := s.items[key]
 	if item.Expired() {
 		delete(s.items, key)
-		return ""
+		return nil
 	}
 	return item.Content
 }
 
 //Set a cached content by key
-func (s Storage) Set(key, content string, duration time.Duration) {
+func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

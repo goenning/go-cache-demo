@@ -30,12 +30,12 @@ func NewStorage(url string) (*Storage, error) {
 }
 
 //Get a cached content by key
-func (s Storage) Get(key string) string {
-	val, _ := s.client.Get(preffix + key).Result()
+func (s Storage) Get(key string) []byte {
+	val, _ := s.client.Get(preffix + key).Bytes()
 	return val
 }
 
 //Set a cached content by key
-func (s Storage) Set(key, content string, duration time.Duration) {
+func (s Storage) Set(key string, content []byte, duration time.Duration) {
 	s.client.Set(preffix+key, content, duration)
 }
