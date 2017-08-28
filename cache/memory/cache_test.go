@@ -33,7 +33,7 @@ func TestGetValue(t *testing.T) {
 func TestGetExpiredValue(t *testing.T) {
 	storage := memory.NewStorage()
 	storage.Set("MY_KEY", []byte("123456"), parse("1s"))
-	time.Sleep(parse("1s"))
+	time.Sleep(parse("1s200ms"))
 	content := storage.Get("MY_KEY")
 
 	assertContentEquals(t, content, []byte(""))
